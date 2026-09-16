@@ -128,7 +128,7 @@
   .song-dropdown .sd-more{ padding:8px 12px; font-family:var(--sans); font-size:11.5px; color:var(--ink-faint); font-style:italic; }
   .song-dropdown .sd-empty{ padding:12px; font-family:var(--sans); font-size:12.5px; color:var(--ink-faint); }
 
-  /* ---- two-search block (Song Titles / Everything) ---- */
+  /* ---- two-search block (Song Titles / Catalog search) ---- */
   .search-section{ margin-bottom:18px; }
   .search-heading{
     font-family:var(--sans); font-size:12px; font-weight:700; text-transform:uppercase;
@@ -295,9 +295,9 @@
         </div>
       </div>
       <div class="search-row">
-        <span class="search-row-label">Everything</span>
+        <span class="search-row-label">Catalog search</span>
         <div class="search-wrap">
-          <input type="search" id="everythingSearchLive" placeholder="Search all information — titles, codes, compilers, and more…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="everythingDropdown">
+          <input type="search" id="everythingSearchLive" placeholder="Search titles, codes, compilers, publishers, places, years…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="everythingDropdown">
           <div class="song-dropdown" id="everythingDropdown" role="listbox"></div>
         </div>
       </div>
@@ -499,6 +499,17 @@
   // system - shapeGlyphHtml() below still shows each book's own shape per row, just no
   // longer used to decide which section it lands in.
 
+  // v2026-09-10 review's own finding: "only show a secondary line when there's a Common
+  // Name" isn't the same guarantee as "only show it when it says something new" - plenty of
+  // Level 1 records get commonName defaulted straight from titleProper (no real short name
+  // exists yet), so hasCommonName was true and secondary was literally the same string as
+  // primary, character for character. Confirmed live: 102 of 159 landing rows repeated
+  // their own title twice. Ordinary normalization (trim, collapse whitespace, case-fold)
+  // catches that without touching any real data - it only decides whether a line prints.
+  function normalizeTitleForCompare(s){
+    return String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+  }
+
   function bookRowHtml(code){
     var b = BOOKS[code];
     var songCount = Object.keys(b.songs || {}).length;
@@ -508,10 +519,11 @@
     // sentence for some real books). Showing both used to genuinely repeat the subtitle
     // text twice, since fullTitle already includes it. Common Name leads, bold; the full
     // title sits below it, smaller, only when there's actually a Common Name to lead with
-    // - a book with no Common Name set just shows its full title once, not twice.
+    // AND it reads as different text once normalized - see normalizeTitleForCompare().
     var hasCommonName = !!(b.commonName && b.commonName.trim());
     var primary = hasCommonName ? b.commonName : (b.fullTitle || code);
-    var secondary = (hasCommonName && b.fullTitle) ? b.fullTitle : "";
+    var secondaryCandidate = (hasCommonName && b.fullTitle) ? b.fullTitle : "";
+    var secondary = (secondaryCandidate && normalizeTitleForCompare(secondaryCandidate) !== normalizeTitleForCompare(primary)) ? secondaryCandidate : "";
     // A Level 1 book genuinely has no page index yet - "0 songs indexed" would read as a
     // real, if oddly specific, negative fact rather than what it actually is: nothing to
     // index yet at all.
@@ -642,18 +654,25 @@
     if(!e.target.closest(".search-wrap")) closeDropdown();
   });
 
-  // ---------------- "Everything" search (typeahead dropdown) ----------------
+  // ---------------- Catalog search (typeahead dropdown) ----------------
   // A second, broader search alongside Song Titles above - Kevin's own split. Song
   // Titles only ever matches a song's own title; this one searches every real, indexed
-  // fact a book carries (title, Common Name, both code systems, compiler, publisher) and
-  // song titles too, since "everything" is meant as the superset, not a separate,
-  // narrower slice. Built once, same as SONG_INDEX above, for the same reason: a plain
-  // substring filter over an in-memory array is plenty fast at this suite's real scale.
+  // Library-level fact a book carries (title, Common Name, both code systems, compiler,
+  // publisher, place published, publication year, shape system) and song titles too. Was
+  // labeled "Everything" until the v2026-09-10 review's own finding: it never actually
+  // searched Level 3-only fields (scripture, meter, key, attributions, historical notes,
+  // sources) since those live in per-edition JSON files this page doesn't preload just to
+  // support a text search - calling it "Everything" overstated what it covers. Renamed to
+  // "Catalog search" (accurate: this is exactly the Library-level catalog data, not the
+  // scholarly Level 3 record) rather than paying to preload every Level 3 file just to make
+  // the old name literally true. Built once, same as SONG_INDEX above, for the same reason:
+  // a plain substring filter over an in-memory array is plenty fast at this suite's real
+  // scale.
   var EVERYTHING_INDEX = (function(){
     var list = [];
     sortedBookCodes().forEach(function(code){
       var b = BOOKS[code];
-      var fields = [b.fullTitle, b.commonName, code, b.workCode, b.shmhaCode, b.compiler, b.publisher].filter(Boolean);
+      var fields = [b.fullTitle, b.commonName, code, b.workCode, b.shmhaCode, b.compiler, b.publisher, b.placePublished, b.publicationYear, b.shapeSystem].filter(Boolean);
       list.push({
         type: "book",
         bookCode: code,
@@ -752,6 +771,17 @@
   var brandLink = document.getElementById("brandLink");
   var registryNavLink = document.getElementById("registryNavLink");
   var currentCode = null;
+  // The page a visitor asked to jump to (from global Song Titles search, or a #Book/page-
+  // style deep link) - navigation state that outlives any single render, not a one-shot
+  // instruction. A Level 3 book's scholarly fetch rerenders renderBookHeader()/
+  // renderSongList() asynchronously, destroying and rebuilding every song row (including
+  // whichever one a one-shot scroll had just highlighted) - v2026-09-10 review's own
+  // blocker, reproduced live: a global search landed on the right book but scrolled/
+  // highlighted a row that the later Level 3 rerender then silently swept away, leaving the
+  // visitor ~87,000px from the song they searched for with no highlight at all. Kept set
+  // (not cleared on a successful jump) for as long as this book stays open, precisely so
+  // the later rerender can re-run the same jump against the row it just rebuilt.
+  var pendingTargetPage = null;
 
   function fieldRow(label, valueHtml){
     return '<div class="field-row"><span class="label">' + esc(label) + '</span><span class="value">' + valueHtml + '</span></div>';
@@ -942,6 +972,10 @@
         if(currentCode === code){
           renderBookHeader(code);
           renderSongList();
+          // Re-run any pending jump against the row this rerender just rebuilt - see
+          // pendingTargetPage's own comment for why a one-shot scroll from navigateToBook()
+          // isn't enough here.
+          scrollToPendingPage();
         }
       });
     }
@@ -1020,28 +1054,41 @@
     songSearch.value = "";
     landingView.style.display = "none";
     detailView.style.display = "block";
+    pendingTargetPage = targetPage || null;
     renderBookHeader(code);
     renderSongList();
     window.location.hash = code;
-    if(targetPage){
-      // Give the song list a moment to actually be in the DOM before hunting for the
-      // row to scroll to - renderSongList() above is synchronous, but scrollIntoView on
-      // a row that hasn't painted yet can be a no-op in some browsers.
-      setTimeout(function(){
-        var row = songListHost.querySelector('.song-row[data-page="' + targetPage.replace(/"/g, '\\"') + '"]');
-        if(row){
-          try{ row.scrollIntoView({ block: "center", behavior: "smooth" }); }catch(e){ try{ row.scrollIntoView(); }catch(e2){} }
-          row.classList.add("jump-highlight");
-          setTimeout(function(){ row.classList.remove("jump-highlight"); }, 1800);
-        }
-      }, 30);
-    } else {
+    scrollToPendingPage();
+  }
+
+  // Performs (or re-performs) the jump to pendingTargetPage, if any - called once right
+  // after navigateToBook()'s own synchronous render, and again from renderBookHeader()'s
+  // async Level 3 callback once that rerender has actually replaced the song list. Not
+  // cleared on a successful jump - see pendingTargetPage's own comment - so the second call
+  // finds the rebuilt row and re-highlights it rather than silently doing nothing because a
+  // now-defunct row was already "handled".
+  function scrollToPendingPage(){
+    if(!pendingTargetPage){
       try{ window.scrollTo(0, 0); }catch(e){ /* non-fatal */ }
+      return;
     }
+    var target = pendingTargetPage;
+    // Give the song list a moment to actually be in the DOM before hunting for the row to
+    // scroll to - the caller's render is synchronous, but scrollIntoView on a row that
+    // hasn't painted yet can be a no-op in some browsers.
+    setTimeout(function(){
+      if(pendingTargetPage !== target) return; // superseded by a newer navigation since this fired
+      var row = songListHost.querySelector('.song-row[data-page="' + target.replace(/"/g, '\\"') + '"]');
+      if(!row) return; // not indexed (or not painted yet) - pendingTargetPage stays set for a later rerender to try
+      try{ row.scrollIntoView({ block: "center", behavior: "smooth" }); }catch(e){ try{ row.scrollIntoView(); }catch(e2){} }
+      row.classList.add("jump-highlight");
+      setTimeout(function(){ row.classList.remove("jump-highlight"); }, 1800);
+    }, 30);
   }
 
   function navigateToLanding(){
     currentCode = null;
+    pendingTargetPage = null;
     landingView.style.display = "block";
     detailView.style.display = "none";
     // Best-effort only: some environments (older browsers, certain file:// origins) can
@@ -1066,7 +1113,15 @@
   }
   window.addEventListener("hashchange", function(){
     var code = window.location.hash.replace(/^#/, "");
-    if(code && BOOKS[code]) navigateToBook(code);
+    // navigateToBook() itself sets window.location.hash, which fires this same listener
+    // right back - a real, observed bug once pendingTargetPage existed: that self-
+    // triggered event called navigateToBook(code) with NO target page, clobbering
+    // pendingTargetPage out from under the scroll timer navigateToBook had just started,
+    // before it ever fired. Skipping when the hash already matches the book already on
+    // screen fixes that at the source, and is also just correct on its own terms - an
+    // external hash change (back/forward, a pasted link, editing the URL bar) is the only
+    // real reason to navigate here; the app confirming its own hash isn't one.
+    if(code && BOOKS[code] && code !== currentCode) navigateToBook(code);
     else if(!code) navigateToLanding();
   });
 })();

@@ -12,6 +12,11 @@
 <script src="tunebook-library.js"></script>
 <script src="shared-utils.js"></script>
 <script>
+  // Tunebook Registry's own version - its own repo, own release notes, tracked separately
+  // from the Tunebook Library data it publishes (shown alongside it in the footer below).
+  var TUNEBOOK_REGISTRY_VERSION = "1.0.0";
+</script>
+<script>
   // Derived from the Tunebook Library rather than loaded directly - this page's own
   // rendering code is completely unchanged below; it still just reads EZ_MINUTES_TUNEBOOKS
   // the same way it always has. Falls back to an empty index rather than throwing if the
@@ -385,7 +390,8 @@
   // actually loaded, confirmed live before fixing. The real, current constant is
   // EZ_MINUTES_TUNEBOOK_LIBRARY_VERSION, set on the Library file this page actually reads.
   document.getElementById("indexVersionFooter").textContent =
-    "Tunebook Library v" + (typeof EZ_MINUTES_TUNEBOOK_LIBRARY_VERSION !== "undefined" ? EZ_MINUTES_TUNEBOOK_LIBRARY_VERSION : "unknown");
+    "Tunebook Registry v" + (typeof TUNEBOOK_REGISTRY_VERSION !== "undefined" ? TUNEBOOK_REGISTRY_VERSION : "unknown") +
+    " · Tunebook Library v" + (typeof EZ_MINUTES_TUNEBOOK_LIBRARY_VERSION !== "undefined" ? EZ_MINUTES_TUNEBOOK_LIBRARY_VERSION : "unknown");
 
   // ---------------- shared helpers ----------------
   // esc and the page-sorting trio (romanValue, comparePageMisc, sortPages) come from

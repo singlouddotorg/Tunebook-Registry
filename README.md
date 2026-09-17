@@ -15,8 +15,9 @@ one they are copies of.
 |---|---|---|
 | [**Minutes**](https://github.com/singlouddotorg/minutes) | Log a singing as it happens, then turn that log into publishable minutes. | Beta |
 | [**Tunebooks**](https://github.com/singlouddotorg/tunebooks) | Curate the shared tunebook data — editions, page indexes, Level 3 scholarly files. | Beta |
-| [**Simple Minutes**](https://github.com/singlouddotorg/simple-minutes) | A phone-sized logger: page numbers only, no names. Its files import straight into Minutes. | 1.0 release |
-| [**Simple Compile**](https://github.com/singlouddotorg/simple-compile) | A one-page, no-editing version of Minutes: open a CSV, get readable minutes back. | 1.0 release |
+| [**Simple Minutes**](https://github.com/singlouddotorg/Simple-Minutes) | A phone-sized logger: page numbers only, no names. Its files import straight into Minutes. | 1.0 release |
+| [**Simple Compile**](https://github.com/singlouddotorg/Simple-Compile) | A one-page, no-editing version of Minutes: open a CSV, get readable minutes back. | 1.0 release |
+| [**Simple Totals**](https://github.com/singlouddotorg/Simple-Totals) | Combines many finished singings into one master record and set of totals. | New (0.1) |
 | [**Tunebook Registry**](https://github.com/singlouddotorg/tunebook-registry) | The published tunebook data the others read. | 1.0 release |
 
 ## How data gets here

@@ -13,22 +13,22 @@ one they are copies of.
 
 | App | What it does | Status |
 |---|---|---|
-| [**Minutes**](https://github.com/singlouddotorg/minutes) | Log a singing as it happens, then turn that log into publishable minutes. | Beta |
-| [**Tunebooks**](https://github.com/singlouddotorg/tunebooks) | Curate the shared tunebook data — editions, page indexes, Level 3 scholarly files. | Beta |
-| [**Simple Minutes**](https://github.com/singlouddotorg/Simple-Minutes) | A phone-sized logger: page numbers only, no names. Its files import straight into Minutes. | 1.0 release |
-| [**Simple Compile**](https://github.com/singlouddotorg/Simple-Compile) | A one-page, no-editing version of Minutes: open a CSV, get readable minutes back. | 1.0 release |
-| [**Ledger**](https://github.com/singlouddotorg/Ledger) | Combines many finished singings into one master record and set of totals. | New (0.1) |
+| [**Secretary**](https://github.com/singlouddotorg/Secretary) | Log a singing as it happens, then turn that log into publishable minutes. | Beta |
+| [**Bibliographer**](https://github.com/singlouddotorg/Bibliographer) | Curate the shared tunebook data — editions, page indexes, Level 3 scholarly files. | Beta |
+| [**Capture**](https://github.com/singlouddotorg/Simple-Minutes) | A phone-sized logger: page numbers only, no names. Its files import straight into Secretary. | 1.0 release |
+| [**Compile**](https://github.com/singlouddotorg/Simple-Compile) | A one-page, no-editing version of Secretary: open a CSV, get readable minutes back. | 1.0 release |
+| [**Singing Ledger**](https://github.com/singlouddotorg/Ledger) | Combines many finished singings into one master record and set of totals. | New (0.1) |
 | [**Tunebook Registry**](https://github.com/singlouddotorg/Tunebook-Registry) | The published tunebook data the others read. | 1.0 release |
 
 ## How data gets here
 
 ```
-edited in Tunebooks  →  exported as tunebook-library.js  →  published here  →  read by the apps
+edited in Bibliographer  →  exported as tunebook-library.js  →  published here  →  read by the apps
 ```
 
-[Tunebooks](https://github.com/singlouddotorg/tunebooks) is the editor. This repository is where its output is
-published. Simple Minutes fetches `tunebook-library.js` directly from here at runtime;
-Minutes and Tunebooks each carry a copy alongside the app.
+[Bibliographer](https://github.com/singlouddotorg/Bibliographer) is the editor. This repository is where its output is
+published. Capture fetches `tunebook-library.js` directly from here at runtime;
+Secretary and Bibliographer each carry a copy alongside the app.
 
 ## What's here
 
@@ -36,7 +36,7 @@ Minutes and Tunebooks each carry a copy alongside the app.
 |---|---|---|
 | `index.html` | Browsable index of every tunebook this project knows about, by level. Open this directly, or visit the repo's GitHub Pages site. |
 | `codes.html` | FAQ on the various code systems used for the same books across different sources. |
-| `shared-utils.js` | Utilities this front page reads from (CSV parsing, page sorting, title building) — the same file Minutes and Tunebooks carry, generated from one source so it can't drift. |
+| `shared-utils.js` | Utilities this front page reads from (CSV parsing, page sorting, title building) — the same file Secretary and Bibliographer carry, generated from one source so it can't drift. |
 | `tunebook-library.js` | The library: every Work and Edition, with page/title indexes for those that have them. |
 | `tunebook-files/` | Level 3 scholarly data — full per-song metadata — one JSON file per Level 3 edition. |
 | `TUNEBOOK-CHANGELOG.md` | What has been added, and when. |

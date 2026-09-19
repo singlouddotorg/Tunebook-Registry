@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tunebook Registry :: SingLoud.org</title>
-<meta name="description" content="A browsable, read-only index of every shape-note tunebook indexed by the Minutes / Tunebooks suite — full titles, editions, and page-by-page song contents, including scholarly detail where available.">
-<!-- This page reads the same tunebook-library.js file the Minutes / Tunebooks suite (Minutes,
-     Tunebooks) ships with — see README.md in this repo for how the two projects relate
+<meta name="description" content="A browsable, read-only index of every shape-note tunebook indexed by the Secretary / Bibliographer suite — full titles, editions, and page-by-page song contents, including scholarly detail where available.">
+<!-- This page reads the same tunebook-library.js file the Secretary / Bibliographer suite (Secretary,
+     Bibliographer) ships with — see README.md in this repo for how the two projects relate
      and how this file gets kept in sync. Nothing here writes back to that file; this is a
      read-only public mirror of it, browsable by anyone with the link. -->
 <script src="tunebook-library.js"></script>
@@ -49,7 +49,7 @@
     });
   }
 </script>
-<!-- No external fonts or CDN scripts, matching the rest of the Minutes / Tunebooks suite. -->
+<!-- No external fonts or CDN scripts, matching the rest of the Secretary / Bibliographer suite. -->
 <style>
   :root{
     --paper:#ffffff;
@@ -268,7 +268,7 @@
     <p class="page-desc">
       A browsable index of the shape-note tunebooks this project has indexed so far — full titles,
       editions, and every page's song content. This is a read-only companion to the
-      <a href="https://github.com/singlouddotorg/minutes" target="_blank" rel="noopener">Minutes / Tunebooks</a>,
+      <a href="https://github.com/singlouddotorg/Secretary" target="_blank" rel="noopener">Secretary / Bibliographer</a>,
       built from the exact same data file Capture and Compile use to log and publish real singing minutes.
       Spot an error or have a correction? <a href="mailto:sacredharpbiblio@gmail.com">Let us know</a> —
       this project is still growing and every correction helps.
@@ -341,7 +341,7 @@
   <span aria-hidden="true">&middot;</span>
   <span>A project of <a href="https://www.singloud.org" target="_blank" rel="noopener">SingLoud.org</a></span>
   <span aria-hidden="true">&middot;</span>
-  <span>Data from the <a href="https://github.com/singlouddotorg/minutes" target="_blank" rel="noopener">Minutes / Tunebooks</a> suite</span>
+  <span>Data from the <a href="https://github.com/singlouddotorg/Secretary" target="_blank" rel="noopener">Secretary / Bibliographer</a> suite</span>
   <span aria-hidden="true">&middot;</span>
   <span id="indexVersionFooter"></span>
   <span aria-hidden="true">&middot;</span>
@@ -378,7 +378,7 @@
   // A real level (1/2/3) on every book, one consistent field regardless of which of the
   // two source projections it came from - the Level 1 projection already calls this
   // supportLevel; Level 2 vs. 3 isn't distinguished by either projection at all, so it's
-  // derived here the same way the main Tunebooks app itself does: whether a real Level 3
+  // derived here the same way the main Bibliographer app itself does: whether a real Level 3
   // Tunebook File is linked.
   function bookLevel(code){
     var b = BOOKS[code];
@@ -397,7 +397,7 @@
 
   // ---------------- shared helpers ----------------
   // esc and the page-sorting trio (romanValue, comparePageMisc, sortPages) come from
-  // shared-utils.js, the same file the main Minutes / Tunebooks suite uses — this page previously
+  // shared-utils.js, the same file the main Secretary / Bibliographer suite uses — this page previously
   // carried its own third copy of them, which is exactly the kind of drift that let a
   // real page-sorting bug ("a108" sorting before "a11") need fixing in three places at
   // once. Keep shared-utils.js beside index.html when deploying: it's a hard load-time
@@ -416,7 +416,7 @@
   // bolting a workaround onto it. Same "negative circled" dingbat family throughout
   // (sans-serif digits for 4/7/0, circled Latin letters for Mixed/Other) for one visually
   // consistent set, not the old serif-digit circles mixed with something else. One
-  // shared vocabulary with the main Tunebooks app - both files keep this identical.
+  // shared vocabulary with the main Bibliographer app - both files keep this identical.
   var SHAPE_SYSTEM_GLYPHS = {
     "4-shape": "\u278D",        // ➍
     "7-shape": "\u2790",        // ➐
